@@ -1,19 +1,26 @@
 package main
 
 import (
-	"elitool/structs"
-	"fmt"
+	"io/ioutil"
+	"os"
+	"time"
 )
 
-type stru struct {
-	Name string
-	Age  int
-}
-
 func main() {
-	st := stru{Name: "姓名", Age: 1}
-	m := structs.Struct2map(st, "Name", "")
-	for k, v := range m {
-		fmt.Println(k, v)
+	os.Mkdir("./file", os.ModePerm)
+	t := time.Now()
+	for i := 0; i < 10; i++ {
+		format := t.Format("20060102")
+		os.Mkdir("./file/"+format, os.ModePerm)
+		os.Create("./file/" + format + "/" + format + ".txt")
+		t = time.Now().AddDate(0, -2, 0-i)
+	}
+
+	dir, _ := ioutil.ReadDir("./file")
+	for _, v := range dir {
+		dirTime, _ := time.Parse("20060102", v.Name())
+		if time.Now().Sub(dirTime).Hours()/24 > 100 {
+			os.RemoveAll("./file/" + v.Name())
+		}
 	}
 }
